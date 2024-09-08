@@ -79,41 +79,28 @@ def find_and_draw_contours(image_path, output_filename):
         print(f"Error finding and drawing contours: {e}")
         return None
 
-import cv2
-import numpy as np
-
-
 def center_cabbage(image_path, output_path):
     # 读取图像
     image = cv2.imread(image_path)
+    
     # 转为灰度图像
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    # 使用边缘检测
-    edges = cv2.Canny(gray, 50, 150)
-    # 找到轮廓
-    contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    # 找到最大轮廓（假设白菜是图像中最大的物体）
-    largest_contour = max(contours, key=cv2.contourArea)
-    # 计算白菜的重心
-    M = cv2.moments(largest_contour)
-    if M["m00"] != 0:
-        cx = int(M["m10"] / M["m00"])  # x 重心
-        cy = int(M["m01"] / M["m00"])  # y 重心
-    else:
-        cx, cy = image.shape[1] // 2, image.shape[0] // 2  # 如果计算失败，则默认图像中心
-    # 获取图像的中心
-    image_center_x = image.shape[1] // 2
-    image_center_y = image.shape[0] // 2
-    # 计算需要平移的距离
-    dx = image_center_x - cx
-    dy = image_center_y - cy
-    # 创建平移矩阵
-    M_translate = np.float32([[1, 0, dx], [0, 1, dy]])
-    # 应用平移矩阵
-    shifted_image = cv2.warpAffine(image, M_translate, (image.shape[1], image.shape[0]))
+    
+    # 找到非黑色像素（灰度值大于0的像素点）
+    non_black_pixels = np.where(gray > 0)
+    
+    # 获取非黑色像素的最上和最下的位置
+    top_y = np.min(non_black_pixels[0])  # 最上端非黑色像素的y坐标
+    bottom_y = np.max(non_black_pixels[0])  # 最下端非黑色像素的y坐标
+    
+    # 裁剪图像，仅保留从最上到最下的非黑色区域
+    cropped_image = image[top_y:bottom_y+1, :]
+    
     # 保存结果图片
-    cv2.imwrite(output_path, shifted_image)
-    return shifted_image
+    cv2.imwrite(output_path, cropped_image)
+    
+    return cropped_image
+
 
 
 def process_file(image_path, output_folder):
