@@ -79,6 +79,7 @@ def find_and_draw_contours(image_path, output_filename):
         print(f"Error finding and drawing contours: {e}")
         return None
 
+
 def center_cabbage(image_path, output_path):
     # 读取图像
     image = cv2.imread(image_path)
@@ -89,12 +90,14 @@ def center_cabbage(image_path, output_path):
     # 找到非黑色像素（灰度值大于0的像素点）
     non_black_pixels = np.where(gray > 0)
     
-    # 获取非黑色像素的最上和最下的位置
-    top_y = np.min(non_black_pixels[0])  # 最上端非黑色像素的y坐标
-    bottom_y = np.max(non_black_pixels[0])  # 最下端非黑色像素的y坐标
+    # 获取非黑色像素的最上、最下、最左和最右的位置
+    top_y = np.min(non_black_pixels[0])    # 最上端非黑色像素的y坐标
+    bottom_y = np.max(non_black_pixels[0]) # 最下端非黑色像素的y坐标
+    left_x = np.min(non_black_pixels[1])   # 最左端非黑色像素的x坐标
+    right_x = np.max(non_black_pixels[1])  # 最右端非黑色像素的x坐标
     
-    # 裁剪图像，仅保留从最上到最下的非黑色区域
-    cropped_image = image[top_y:bottom_y+1, :]
+    # 裁剪图像，仅保留从最上到最下、最左到最右的非黑色区域
+    cropped_image = image[top_y:bottom_y+1, left_x:right_x+1]
     
     # 保存结果图片
     cv2.imwrite(output_path, cropped_image)
