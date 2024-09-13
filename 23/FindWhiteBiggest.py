@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 # 读取输入图片
-image = cv2.imread('centered_22A-T-34-2球形侧视图.JPG')
+image = cv2.imread('centered_22A-T-36-11球形侧视图.JPG')
 
 # 获取图片的尺寸
 height, width = image.shape[:2]
