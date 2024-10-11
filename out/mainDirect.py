@@ -1,9 +1,12 @@
+import tkinter as tk
+from tkinter import filedialog, messagebox
+from PIL import Image, ImageTk, ImageFilter, ImageEnhance
 import cv2
 import numpy as np
 import os
 import csv
-from PIL import Image
-from skimage import measure
+import logging
+import matplotlib.pyplot as plt
 
 green_lower = np.array([30, 40, 20])
 green_upper = np.array([90, 255, 255])
@@ -82,7 +85,7 @@ def find_and_draw_contours(image_path, output_filename):
                 max_contour = contour
         contours_white, _ = cv2.findContours(white_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         mask = np.zeros_like(image)
-        cv2.drawContours(mask, [max_contour], -1, color=(0, 0, 0), thickness=cv2.FILLED)
+        # cv2.drawContours(mask, [max_contour], -1, color=(0, 0, 0), thickness=cv2.FILLED)
         extracted_image = cv2.bitwise_and(image, mask)
         cv2.imwrite(output_filename, extracted_image)
         return output_filename
@@ -213,7 +216,7 @@ def BallShapeOUT(image_path):
         if midRa > uppRa and midRa > lowRa:
             return 3
 
-        if are_numbers_close(midRa, midRa, lowRa, threshold=0.1) and midRa > uppRa:
+        if are_numbers_close(midRa, lowRa, uppRa, threshold=0.1) and midRa > uppRa:
             return 8
 
         if uppRa > midRa and uppRa > lowRa:
@@ -248,21 +251,24 @@ def calculate_perimeter_Curve_radio(image_path):
         print(f"Error calculating perimeter curve ratio: {e}")
         return None
 
+# Setup logging
+logging.basicConfig(filename='cabbage_processor.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+
 # Define the directories
 input_folder = './'
 output_folder = './output/Cabbage'
 center_output_folder = './output/center'
 hug_output_folder = './output/hug'
 
-# Create output directories if they don't exist
+# 创建输出目录
 os.makedirs(output_folder, exist_ok=True)
 os.makedirs(center_output_folder, exist_ok=True)
 os.makedirs(hug_output_folder, exist_ok=True)
 
-# List all PNG files in the current directory
+# 列出当前目录中的所有PNG文件
 png_files = [f for f in os.listdir(input_folder) if f.endswith('.png')]
 
-# Initialize the CSV output
+# 初始化CSV输出
 csv_output_path = './output/outcome.csv'
 with open(csv_output_path, mode='w', newline='') as csvfile:
     csvwriter = csv.writer(csvfile)
@@ -303,3 +309,5 @@ with open(csv_output_path, mode='w', newline='') as csvfile:
             csvwriter.writerow(row)
         except Exception as e:
             print(f"Error processing file {png_file}: {e}")
+
+
