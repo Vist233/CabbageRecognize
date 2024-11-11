@@ -34,7 +34,7 @@ This project is a Python-based image processing tool designed to analyze and cla
     pip install -r requirements.txt
     ```
 
-    *`requirements.txt` Example:*
+    *`requirements.txt`:*
 
     ```plaintext
     opencv-python
